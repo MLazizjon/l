@@ -1,16 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Truck, User, Lock, Eye, EyeOff, ShieldCheck, UserRound, AlertCircle } from 'lucide-react';
+import { Truck, User, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import {
   Wrap, Visual, VisualTop, Route, Stop, Line, Mover, VisualText, FormSide, FormBox,
-  Heading, InputWrap, ErrorBox, Submit, DemoRow, DemoBtn,
+  Heading, InputWrap, ErrorBox, Submit,
 } from './styles';
-
-const DEMO = [
-  { label: 'Admin', icon: ShieldCheck, username: 'admin', password: 'admin123' },
-  { label: 'User', icon: UserRound, username: 'user', password: 'user123' },
-];
 
 export default function Login() {
   const { login } = useAuth();
@@ -100,17 +95,6 @@ export default function Login() {
           {error && <ErrorBox><AlertCircle />{error}</ErrorBox>}
 
           <Submit type="submit">Kirish</Submit>
-
-          {/* <DemoRow>
-            <span>Sinov uchun kirish:</span>
-            <div>
-              {DEMO.map(({ label, icon: Icon, username, password }) => (
-                <DemoBtn key={label} type="button" onClick={() => { setError(''); setForm({ username, password }); }}>
-                  <Icon /> {label}
-                </DemoBtn>
-              ))}
-            </div>
-          </DemoRow> */}
         </FormBox>
       </FormSide>
     </Wrap>

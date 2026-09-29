@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, Package, Truck, Handshake, Factory, Send, BarChart3, Users,
+  LayoutDashboard, Truck, Handshake, Factory, BarChart3, Users,
 } from 'lucide-react';
 
 /* adminOnly: true — faqat admin ko'radi */
