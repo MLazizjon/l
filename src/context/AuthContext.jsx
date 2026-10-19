@@ -5,6 +5,8 @@ import { PARTNERS, PARTNER_TYPES, normalize, denormalize } from '../data/partner
 const SESSION_KEY = 'yukcrm_session';
 const PARTNER_SESSION_KEY = 'yukcrm_partner_session';
 const LAST_PARTNER_LOGIN = 'yukcrm_partner_last_login';
+const DRIVER_SESSION_KEY = 'yukcrm_driver_session';
+const LAST_DRIVER_LOGIN = 'yukcrm_driver_last_login';
 
 const read = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
 const write = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch { /* */ } };
@@ -16,9 +18,10 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const data = useData();
-  const { users, create } = data;
+  const { users, drivers, create } = data;
   const [userId, setUserId] = useState(() => read(SESSION_KEY));
   const [partnerSession, setPartnerSession] = useState(readPartnerSession);
+  const [driverId, setDriverId] = useState(() => read(DRIVER_SESSION_KEY));
 
   // O'chirilgan hisob bo'lsa — sessiya avtomatik tugaydi (admin o'chirsa, tizimdan chiqib ketadi)
   const user = users.find((u) => u.id === userId) || null;
@@ -28,6 +31,11 @@ export function AuthProvider({ children }) {
     // Admin loginni olib tashlasa ham kabinet yopiladi
     return raw && raw.username ? normalize(partnerSession.type, raw) : null;
   }, [partnerSession, data]);
+  // Haydovchi o'chirilsa yoki logini olib tashlansa — kabinet yopiladi
+  const driver = useMemo(
+    () => drivers.find((d) => d.id === driverId && d.username) || null,
+    [drivers, driverId]
+  );
 
   /* ---------- Xodimlar (admin, direktor, dispetcher) ---------- */
   const login = useCallback(
@@ -63,11 +71,21 @@ export function AuthProvider({ children }) {
     [data]
   );
 
+  const findDriverByLogin = useCallback(
+    (username) => {
+      const q = username.trim().toLowerCase();
+      return q ? drivers.find((d) => d.username && d.username.toLowerCase() === q) || null : null;
+    },
+    [drivers]
+  );
+
+  // Login butun tizimda yagona: xodimlar, hamkorlar va haydovchilar
   const loginTaken = useCallback(
     (username) =>
       findPartnersByLogin(username).length > 0 ||
+      !!findDriverByLogin(username) ||
       users.some((u) => u.username.toLowerCase() === username.trim().toLowerCase()),
-    [findPartnersByLogin, users]
+    [findPartnersByLogin, findDriverByLogin, users]
   );
 
   const startPartnerSession = (type, id, username) => {
@@ -111,6 +129,57 @@ export function AuthProvider({ children }) {
     write(PARTNER_SESSION_KEY, null);
   }, []);
 
+  /* ---------- Haydovchilar ---------- */
+  const startDriverSession = (id, username) => {
+    setDriverId(id);
+    write(DRIVER_SESSION_KEY, id);
+    write(LAST_DRIVER_LOGIN, username);
+  };
+
+  // Natija: { ok } yoki { error: 'not_found' | 'wrong_password' }
+  const driverLogin = useCallback(
+    (username, password) => {
+      const found = findDriverByLogin(username);
+      if (!found) return { error: 'not_found' };
+      if (found.password !== password) return { error: 'wrong_password' };
+      startDriverSession(found.id, found.username);
+      return { ok: true };
+    },
+    [findDriverByLogin]
+  );
+
+  // O'zi ro'yxatdan o'tgan haydovchi — admin ro'yxatida alohida ko'rinadi
+  const driverRegister = useCallback(
+    (form) => {
+      if (loginTaken(form.username)) return { error: 'taken' };
+      const now = new Date().toISOString();
+      const id = create('drivers', {
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        truck: form.truck.trim(),
+        plate: form.plate.trim().toUpperCase(),
+        truckType: form.truckType,
+        experience: form.experience,
+        city: form.location.trim(),
+        location: form.location.trim(),
+        locationAt: now,
+        status: 'Faol',
+        username: form.username.trim(),
+        password: form.password,
+        selfRegistered: true,
+        createdAt: now,
+      });
+      startDriverSession(id, form.username.trim());
+      return { ok: true };
+    },
+    [create, loginTaken]
+  );
+
+  const driverLogout = useCallback(() => {
+    setDriverId(null);
+    write(DRIVER_SESSION_KEY, null);
+  }, []);
+
   const value = useMemo(() => {
     const role = user?.role;
     return {
@@ -130,8 +199,15 @@ export function AuthProvider({ children }) {
       findPartnersByLogin,
       loginTaken,
       lastPartnerLogin: read(LAST_PARTNER_LOGIN) || '',
+      driver,
+      driverLogin,
+      driverRegister,
+      driverLogout,
+      findDriverByLogin,
+      lastDriverLogin: read(LAST_DRIVER_LOGIN) || '',
     };
-  }, [user, login, logout, partner, partnerLogin, partnerRegister, partnerLogout, findPartnersByLogin, loginTaken]);
+  }, [user, login, logout, partner, partnerLogin, partnerRegister, partnerLogout, findPartnersByLogin, loginTaken,
+    driver, driverLogin, driverRegister, driverLogout, findDriverByLogin]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

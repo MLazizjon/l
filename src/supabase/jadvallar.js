@@ -17,7 +17,9 @@ const FIELDS = {
   users: { id: 'id', name: 'ism', username: 'login', password: 'parol', role: 'rol' },
   drivers: {
     id: 'id', name: 'ism', phone: 'telefon', truck: 'mashina', plate: 'raqam', city: 'shahar',
-    experience: 'tajriba', status: 'holat',
+    experience: 'tajriba', status: 'holat', truckType: 'mashina_turi',
+    location: 'joriy_joy', heading: 'yonalish', locationAt: 'joy_yangilangan',
+    username: 'login', password: 'parol', selfRegistered: 'ozi_royxatdan', createdAt: 'yaratilgan',
   },
   brokers: {
     id: 'id', name: 'ism', company: 'kompaniya', phone: 'telefon', commission: 'komissiya', status: 'holat',

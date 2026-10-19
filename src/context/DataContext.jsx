@@ -13,6 +13,9 @@ const COLLECTIONS = Object.keys(TABLES);
 /* Supabase xatosini o'zbekcha tushunarli matnga aylantiradi */
 const humanError = (err) => {
   const m = err?.message || String(err);
+  if (/column .* does not exist|Could not find the '.*' column/i.test(m)) {
+    return t("Bazani yangilash kerak: yangilanish_v3.sql faylini Supabase SQL Editor'da ishga tushiring.");
+  }
   if (/relation .* does not exist|Could not find the table/i.test(m)) {
     return t("Supabase'da jadvallar topilmadi. yukcrm_supabase.sql faylini SQL Editor'da ishga tushiring.");
   }

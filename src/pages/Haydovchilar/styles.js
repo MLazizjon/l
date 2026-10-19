@@ -47,3 +47,25 @@ export const TripCount = styled.span`
   color: ${({ theme }) => theme.colors.primary};
   font-weight: 700;
 `;
+
+/* Hozirgi joyi, yo'nalishi va qachon yangilangani */
+export const Location = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  b, span { display: inline-flex; align-items: center; gap: 5px; }
+  b { font-weight: 600; }
+  b svg { width: 14px; height: 14px; color: ${({ theme }) => theme.colors.primary}; }
+  span { font-size: 12.5px; color: ${({ theme }) => theme.colors.ink}; }
+  span svg { width: 12px; height: 12px; color: ${({ theme }) => theme.colors.gray}; }
+  small { font-size: 11.5px; color: ${({ theme }) => theme.colors.grayLight}; }
+`;
+
+export const Cabinet = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  white-space: nowrap;
+  svg { width: 14px; height: 14px; color: ${({ theme }) => theme.colors.primary}; }
+`;

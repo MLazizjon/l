@@ -15,6 +15,8 @@ import Foydalanuvchilar from './pages/Foydalanuvchilar/Foydalanuvchilar';
 import Korinish from './pages/Korinish/Korinish';
 import HamkorKirish from './pages/HamkorKirish/HamkorKirish';
 import HamkorPanel from './pages/HamkorPanel/HamkorPanel';
+import HaydovchiKirish from './pages/HaydovchiKirish/HaydovchiKirish';
+import HaydovchiPanel from './pages/HaydovchiPanel/HaydovchiPanel';
 
 const MANAGERS = ['admin', 'director'];
 
@@ -34,8 +36,13 @@ function RequirePartner({ children }) {
   return partner ? children : <Navigate to="/kabinet" replace />;
 }
 
+function RequireDriver({ children }) {
+  const { driver } = useAuth();
+  return driver ? children : <Navigate to="/haydovchi" replace />;
+}
+
 export default function App() {
-  const { user, partner } = useAuth();
+  const { user, partner, driver } = useAuth();
   useLang(); // til almashganda butun ilova qayta chiziladi
 
   return (
@@ -47,6 +54,10 @@ export default function App() {
       <Route path="/kabinet/panel" element={<RequirePartner><HamkorPanel /></RequirePartner>} />
       <Route path="/yukchi" element={<Navigate to="/kabinet" replace />} />
       <Route path="/zavod" element={<Navigate to="/kabinet/panel" replace />} />
+
+      {/* Haydovchi kabineti — o'zi ro'yxatdan o'tadi, joyini va holatini yangilaydi: /haydovchi */}
+      <Route path="/haydovchi" element={driver ? <Navigate to="/haydovchi/panel" replace /> : <HaydovchiKirish />} />
+      <Route path="/haydovchi/panel" element={<RequireDriver><HaydovchiPanel /></RequireDriver>} />
 
       <Route
         element={

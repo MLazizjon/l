@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import {
-  Plus, Pencil, Trash2, X, ShieldCheck, UserRound, RotateCcw, Eye, EyeOff, Users, Copy, Search as SearchIcon,
+  Plus, Pencil, Trash2, X, Truck, ShieldCheck, UserRound, RotateCcw, Eye, EyeOff, Users, Copy, Search as SearchIcon,
 } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 import { useAuth } from '../../context/AuthContext';
@@ -16,6 +16,10 @@ import {
 import { RoleTag, You, Hint, Danger, Secret } from './styles';
 
 const EMPTY = { name: '', username: '', password: '', role: 'user' };
+
+// Hisob turi -> jadval: hamkorlar va haydovchilar
+const collOf = (kind) => (kind === 'driver' ? 'drivers' : PARTNERS[kind].collection);
+const iconOf = (kind) => (kind === 'driver' ? Truck : PARTNERS[kind]?.icon);
 
 /* Hamma hisoblar bir joyda: xodimlar va hamkorlar (zavod, broker, kompaniya).
    O'chirilgan hisob egasi tizimdan darhol chiqib ketadi. */
@@ -36,6 +40,9 @@ export default function Foydalanuvchilar() {
     if (tab === 'staff') {
       return users.map((u) => ({ id: u.id, kind: 'staff', name: u.name, username: u.username, password: u.password, role: u.role }));
     }
+    if (tab === 'driver') {
+      return data.drivers.filter((d) => d.username).map((d) => ({ id: d.id, kind: 'driver', name: d.name, username: d.username, password: d.password }));
+    }
     return data[PARTNERS[tab].collection]
       .map((p) => normalize(tab, p))
       .filter((p) => p.username)
@@ -43,11 +50,11 @@ export default function Foydalanuvchilar() {
   }, [tab, users, data]);
 
   const rows = accounts.filter((a) => matches(a, query, ['name', 'username']));
-  const countOf = (k) => (k === 'staff' ? users.length : data[PARTNERS[k].collection].filter((p) => p.username).length);
+  const countOf = (k) => (k === 'staff' ? users.length : data[collOf(k)].filter((p) => p.username).length);
 
   const allLogins = () => [
     ...users.map((u) => ({ kind: 'staff', id: u.id, username: u.username })),
-    ...PARTNER_TYPES.flatMap((k) => data[PARTNERS[k].collection].filter((p) => p.username).map((p) => ({ kind: k, id: p.id, username: p.username }))),
+    ...[...PARTNER_TYPES, 'driver'].flatMap((k) => data[collOf(k)].filter((p) => p.username).map((p) => ({ kind: k, id: p.id, username: p.username }))),
   ];
 
   const openNew = () => { setError(''); setEdit({ kind: 'staff', id: null, form: EMPTY }); };
@@ -71,7 +78,7 @@ export default function Foydalanuvchilar() {
       else create('users', payload);
     } else {
       // Hamkor nomi o'z sahifasida o'zgartiriladi, bu yerda faqat kirish ma'lumotlari
-      update(PARTNERS[kind].collection, id, { username: form.username.trim(), password: form.password });
+      update(collOf(kind), id, { username: form.username.trim(), password: form.password });
     }
     setEdit(null);
   };
@@ -80,18 +87,19 @@ export default function Foydalanuvchilar() {
 
   const onDelete = () => {
     if (del.kind === 'staff') remove('users', del.id);
-    else remove(PARTNERS[del.kind].collection, del.id);
+    else remove(collOf(del.kind), del.id);
     setDel(null);
   };
 
   const copy = (a) => {
-    const text = `${window.location.origin}${a.kind === 'staff' ? '/login' : '/kabinet'}\n${t('Login')}: ${a.username}\n${t('Parol')}: ${a.password}`;
+    const text = `${window.location.origin}${a.kind === 'staff' ? '/login' : a.kind === 'driver' ? '/haydovchi' : '/kabinet'}\n${t('Login')}: ${a.username}\n${t('Parol')}: ${a.password}`;
     navigator.clipboard?.writeText(text).catch(() => {});
   };
 
   const TABS = [
     { value: 'staff', label: 'Xodimlar', icon: Users },
     ...PARTNER_TYPES.map((k) => ({ value: k, label: PARTNERS[k].many, icon: PARTNERS[k].icon })),
+    { value: 'driver', label: 'Haydovchilar', icon: Truck },
   ];
 
   return (
@@ -127,7 +135,7 @@ export default function Foydalanuvchilar() {
             <tbody>
               {rows.map((a) => {
                 const key = `${a.kind}:${a.id}`;
-                const PIcon = a.kind !== 'staff' ? PARTNERS[a.kind].icon : null;
+                const PIcon = a.kind !== 'staff' ? iconOf(a.kind) : null;
                 return (
                   <tr key={key}>
                     <td>
@@ -148,7 +156,7 @@ export default function Foydalanuvchilar() {
                     <td>
                       {a.kind === 'staff' ? (
                         <RoleTag $admin={a.role !== 'user'}>{a.role === 'admin' ? <ShieldCheck /> : <UserRound />}{roleLabel(a.role)}</RoleTag>
-                      ) : <Muted>{t(PARTNERS[a.kind].one)}</Muted>}
+                      ) : <Muted>{a.kind === 'driver' ? t('Haydovchi') : t(PARTNERS[a.kind].one)}</Muted>}
                     </td>
                     <td>
                       <Actions>
@@ -217,7 +225,9 @@ export default function Foydalanuvchilar() {
               {error ? <Hint $error>{error}</Hint> : (
                 <Hint>{edit.kind === 'staff'
                   ? t('Dispetcher faqat kelgan yuklar, hamkorlar, haydovchilar va Telegram bo\'limlarini ko\'radi.')
-                  : t('Hamkor shu login va parol bilan kabinetga kiradi.')}</Hint>
+                  : edit.kind === 'driver'
+                    ? t('Haydovchi shu login va parol bilan /haydovchi kabinetiga kiradi.')
+                    : t('Hamkor shu login va parol bilan kabinetga kiradi.')}</Hint>
               )}
             </ModalBody>
             <ModalFoot>

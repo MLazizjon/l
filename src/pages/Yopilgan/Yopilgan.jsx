@@ -66,7 +66,7 @@ export default function Yopilgan() {
     update('cargo', c.id, { status: 'Yetkazildi', deliveredAt: today() });
     // Haydovchining boshqa faol reysi bo'lmasa — u yana bo'sh
     const busy = cargo.some((x) => x.id !== c.id && x.driverId === c.driverId && x.status === "Yo'lda");
-    if (c.driverId && !busy) update('drivers', c.driverId, { status: t('Faol') });
+    if (c.driverId && !busy) update('drivers', c.driverId, { status: 'Faol' });
   };
 
   const data = useData();

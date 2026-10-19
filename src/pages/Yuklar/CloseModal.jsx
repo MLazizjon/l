@@ -112,7 +112,7 @@ export default function CloseModal({ cargoItem, onClose }) {
                   <FormSelect name="driverId" value={form.driverId} onChange={onChange}>
                     <option value="">{t('Tanlang...')}</option>
                     {sorted.map((d) => (
-                      <option key={d.id} value={d.id}>{d.name} — {d.plate} ({t(d.status)})</option>
+                      <option key={d.id} value={d.id}>{d.name} — {d.plate} · {d.location || d.city || '—'} ({t(d.status)})</option>
                     ))}
                   </FormSelect>
                 </Field>
@@ -123,7 +123,7 @@ export default function CloseModal({ cargoItem, onClose }) {
                   <div className="info">
                     <strong>{driver.name}</strong>
                     <span>{driver.truck} · <b>{driver.plate}</b></span>
-                    <span><Phone />{driver.phone} · {driver.city}</span>
+                    <span><Phone />{driver.phone} · <MapPin />{driver.location || driver.city}{driver.heading ? ` → ${driver.heading}` : ''}</span>
                   </div>
                   <Badge $tone={toneOf(driver.status)}>{t(driver.status)}</Badge>
                 </DriverCard>

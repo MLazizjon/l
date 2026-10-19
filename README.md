@@ -23,6 +23,22 @@ Zavodlar, brokerlar va logistika kompaniyalari shu havola orqali o'zi login/paro
 (yoki admin yaratib beradi) va o'z kabinetidan yuk joylaydi.
 Demo: `zarafshon / 123456` (zavod), `tezyuk / 123456` (broker), `silkroad / 123456` (kompaniya).
 
+## Haydovchi kabineti — havola: `/haydovchi`
+
+Haydovchilar zavod va brokerlar kabi o'zi ro'yxatdan o'tadi (ism, telefon, mashina, davlat raqami,
+hozirgi joyi, login/parol) yoki admin bergan login bilan kiradi. Kabinetda:
+- **Hozirgi joyi** va **qayerga yuk olmoqchi** ekanini yangilaydi (qachon yangilangani ko'rinadi);
+- holatini tanlaydi: **Bo'shman — yuk olaman** yoki **Dam olyapman** (reysda bo'lsa "Yo'lda" — dispetcher boshqaradi);
+- o'z reyslarini, yuklash/yetib borish sanalarini va o'ziga to'lovni ko'radi;
+- ma'lumotlari va parolini o'zgartiradi.
+
+Admin **Haydovchilar** bo'limida ikki ro'yxat: **Doimiy haydovchilar** (admin qo'shgan) va
+**O'zi qo'shilgan haydovchilar** (kabinet orqali). O'zi qo'shilganini bir bosishda doimiyga o'tkazish mumkin.
+Haydovchi loginlari **Foydalanuvchilar va loginlar → Haydovchilar** tabida ham ko'rinadi.
+Demo: `otabek / 123456`.
+
+**Bazaga:** SQL Editor'da `src/supabase/yangilanish_v3.sql` ni bir marta ishga tushiring.
+
 Yuk formasi — majburiy: nomi, turi, og'irlik, qayerdan, qayerga, narx, telefon;
 ixtiyoriy: hajm (m³), mashina turi, yuklash sanasi, izoh.
 
@@ -53,7 +69,7 @@ Eslatma: bot faqat o'zi admin bo'lgan kanal/guruh xabarlarini ko'radi.
 
 ## Supabase
 
-**Mavjud bazani yangilash:** SQL Editor'da faqat `src/supabase/yangilanish_v2.sql` ni ishga tushiring
+**Mavjud bazani yangilash:** SQL Editor'da `src/supabase/yangilanish_v2.sql`, keyin `src/supabase/yangilanish_v3.sql` ni ishga tushiring
 (yangi jadval/ustunlarni qo'shadi, ma'lumotlar o'chmaydi). Yangi bo'sh baza uchun — `yukcrm_supabase.sql`.
 
 Ma'lumotlar Supabase'da saqlanadi (loyiha: **logist**).

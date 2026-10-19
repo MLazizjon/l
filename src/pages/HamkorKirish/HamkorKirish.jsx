@@ -97,7 +97,10 @@ export default function HamkorKirish() {
       <FormSide>
         <Box>
           <TopRow>
-            <BackLink as={Link} to="/login"><ArrowLeft /> {t('Xodimlar kirishi')}</BackLink>
+            <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+              <BackLink as={Link} to="/login"><ArrowLeft /> {t('Xodimlar kirishi')}</BackLink>
+              <BackLink as={Link} to="/haydovchi"><Truck /> {t('Haydovchi kabineti')}</BackLink>
+            </div>
             <div style={{ display: 'flex', gap: 8 }}><LangSwitcher /><ThemeToggle /></div>
           </TopRow>
 

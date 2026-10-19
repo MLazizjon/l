@@ -72,6 +72,7 @@ export default function Hamkorlar({ type }) {
     if (login) {
       const taken = ['factories', 'brokers', 'companies'].some((col) =>
         data[col].some((x) => x.username?.toLowerCase() === login && !(col === cfg.collection && x.id === editId)))
+        || data.drivers.some((d) => d.username?.toLowerCase() === login)
         || data.users.some((u) => u.username.toLowerCase() === login);
       if (taken) return setError(t('Bu login band. Boshqa login tanlang.'));
       if (form.password.length < 4) return setError(t("Parol kamida 4 ta belgidan iborat bo'lsin."));

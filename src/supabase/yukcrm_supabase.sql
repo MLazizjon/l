@@ -175,6 +175,18 @@ values ('korinish', '{"factory": true, "broker": true, "company": true, "admin":
 on conflict (id) do nothing;
 
 -- =====================================================================
+-- 6.2 YANGILANISH (v3): haydovchi kabineti — o'zi ro'yxatdan o'tadi, joyini yangilaydi
+-- =====================================================================
+alter table haydovchilar add column if not exists mashina_turi    text;
+alter table haydovchilar add column if not exists joriy_joy       text;          -- hozir qayerda
+alter table haydovchilar add column if not exists yonalish        text;          -- qayerga yuk olmoqchi
+alter table haydovchilar add column if not exists joy_yangilangan timestamptz;
+alter table haydovchilar add column if not exists login           text;
+alter table haydovchilar add column if not exists parol           text;
+alter table haydovchilar add column if not exists ozi_royxatdan   boolean not null default false;  -- true = o'zi qo'shilgan
+create unique index if not exists haydovchilar_login_uq on haydovchilar (lower(login)) where login is not null;
+
+-- =====================================================================
 -- 7. KO'RINISHLAR (VIEW) — tayyor hisobotlar
 -- =====================================================================
 
@@ -429,3 +441,7 @@ on conflict (id) do nothing;
 insert into yuklar (id, nomi, manba, kompaniya_id, qayerdan, qayerga, ogirlik, hajm, yuk_turi, narx, mashina_turi, telefon, holat, sana, qoshgan) values
   ('c20', 'Paxta tolasi, toylarda', 'kompaniya', 'k1', 'Buxoro', 'Moskva', 20, 82, 'Tekstil', 38000000, 'Tent (fura)', '+998 90 600 70 80', 'Kutilmoqda', current_date, 'hamkor')
 on conflict (id) do nothing;
+
+-- Demo: haydovchi kabineti (otabek / 123456)
+update haydovchilar set login = 'otabek', parol = '123456', joriy_joy = shahar, joy_yangilangan = now()
+where id = 'd2' and login is null;

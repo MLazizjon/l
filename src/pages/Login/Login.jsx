@@ -125,6 +125,15 @@ export default function Login() {
             </span>
             <ArrowRight className="arrow" />
           </ShipperLink>
+
+          <ShipperLink as={Link} to="/haydovchi">
+            <span className="ico"><Truck /></span>
+            <span className="txt">
+              <strong>{t("Haydovchi kabineti")}</strong>
+              <small>{t("Haydovchi sifatida ro'yxatdan o'tish va joyingizni yangilash")}</small>
+            </span>
+            <ArrowRight className="arrow" />
+          </ShipperLink>
         </FormBox>
       </FormSide>
     </Wrap>
